@@ -1,0 +1,7 @@
+env/
+.env
+__pycache__/
+*.pyc
+models/
+data/raw/
+esp32/secrets.h

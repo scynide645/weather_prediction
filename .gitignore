@@ -3,5 +3,10 @@ env/
 __pycache__/
 *.pyc
 models/
-data/raw/
+data/raw/bmkg_raw.json
+data/processed/weather_features.csv
+src/preprocessing/preprocess_bmkg.py
+src/training/train.py
+src/data_loader/download_bmkg.py
+notebooks/feature_engineering.ipynb
 esp32/secrets.h

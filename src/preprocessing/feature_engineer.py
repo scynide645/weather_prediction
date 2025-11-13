@@ -80,10 +80,10 @@ df['DayOfYear'] = df['Date'].dt.dayofyear
 
 #Dropping unused Columns
 df.drop(columns=['Location','WindGustDir', 'WindDir9am', 'WindDir3pm', 'windGustDir_deg', 
-                 'windDir9am_deg', 'windDir3pm_deg', 'Date'])
+                 'windDir9am_deg', 'windDir3pm_deg', 'Date'], inplace=True)
 
 #Reseting index
 df.reset_index(drop=True, inplace=True)
 
 with open(PROCESSED_FILE, 'w') as f:
-    df.to_csv(f)
+    df.to_csv(f, index=False)

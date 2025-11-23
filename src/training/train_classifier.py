@@ -33,8 +33,9 @@ clf.fit(x_train, y_class_train)
 
 base_path = ROOT_DIR /'models'
 
-# Evaluation
 y_pred = clf.predict(x_test)
+
+# Evaluation
 report_path = base_path / 'rain_classifier_report.txt'
 with open(report_path, 'w') as f:
     f.write(f"Accuracy: {accuracy_score(y_class_test, y_pred)}\n\n")

@@ -4,7 +4,7 @@ import numpy as np
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 RAW_FILE = ROOT_DIR /'data'/'raw'/'weatherAUS.csv'
-PROCESSED_FILE = ROOT_DIR/'data'/'processed'/'AUS_weather_features.csv'
+PROCESSED_FILE = ROOT_DIR/'data'/'processed'/'AUS_weather_features_v.1.0.csv'
 
 df = pd.read_csv(RAW_FILE)
 
@@ -85,5 +85,18 @@ df.drop(columns=['Location','WindGustDir', 'WindDir9am', 'WindDir3pm', 'windGust
 #Reseting index
 df.reset_index(drop=True, inplace=True)
 
+## For v.1.0 weather prediction i just can use DHT 11, so lets fit features in df
+
+df['hum_now'] = df.loc[:, 'Humidity3pm']
+df['temp_now'] = df.loc[:, 'Temp3pm']
+
+df.drop(columns=['MinTemp', 'MaxTemp', 'Rainfall', 'WindGustSpeed', 'WindSpeed9am',
+       'WindSpeed3pm', 'Humidity9am', 'Humidity3pm', 'Pressure9am',
+       'Pressure3pm', 'Temp9am', 'Temp3pm', 'RainToday',
+       'windGust_x', 'windGust_y', 'wind9am_x', 'wind9am_y', 'wind3pm_x',
+       'wind3pm_y'], inplace= True)
+
 with open(PROCESSED_FILE, 'w') as f:
     df.to_csv(f, index=False)
+
+

@@ -2,12 +2,15 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import joblib
+import os
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-RAW_FILE = ROOT/'data'/'raw'/'weatherAUS.csv'
-OUT_TRAIN = ROOT/'data'/'processed'/'train_processed.csv'
-OUT_TEST = ROOT/'data'/'processed'/'test_processed.csv'
-ARTIFACTS_DIR = ROOT/'artifacts'
+RAW_FILE = Path(os.path.join(ROOT, 'data', 'raw', 'weatherAUS.csv'))
+processed_dir = Path(os.path.join(Root, 'data', 'processed'))
+processed_dir.mkdir(exist_ok=True)
+OUT_TRAIN = Path(os.path.join(processed_dir, 'train_processed.csv'))
+OUT_TEST = Path(os.path.join(processed_dir, 'processed','test_processed.csv'))
+ARTIFACTS_DIR = Path(os.path.join(ROOT, 'artifacts'))
 ARTIFACTS_DIR.mkdir(exist_ok=True)
 
 def load_and_clean(df):
@@ -23,6 +26,11 @@ def load_and_clean(df):
 
     # 3. Drop rows with >10 NaN
     df = df.drop(df.loc[df.isna().sum(axis=1) > 10].index)
+
+    # 4. FillNa pada RainTomorrow dg No
+    df['RainTomorrow'] = df['RainTomorrow'].fillna('No')
+    df['RainToday'] = df['RainToday'].fillna('No')
+
 
     return df
 
@@ -157,7 +165,7 @@ def main():
     train.to_csv(OUT_TRAIN, index=False)
     test.to_csv(OUT_TEST, index=False)
 
-    print("Processing complete. No leakage. Artifacts saved.")
+    print("Proses Berhasil... Yeyeyyy")
 
 
 if __name__ == "__main__":

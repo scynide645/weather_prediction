@@ -1,54 +1,59 @@
 import sys
+import os
 from pathlib import Path
 ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(ROOT))
 
-from src.preprocessing.feature_engineer import ROOT_DIR, PROCESSED_FILE
+from src.preprocessing.preprocess_train import OUT_TRAIN, OUT_TEST
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import pandas as pd
 import joblib
 
 
-# Load dataset
-df = pd.read_csv(PROCESSED_FILE)
+# Load data train dan test
+train = pd.read_csv(OUT_TRAIN)
+test =  pd.read_csv(OUT_TEST)
 
-# Split features and target
-X = df.drop(columns='RainTomorrow')
-y_class = df['RainTomorrow']
+#Split
+x_train = train.drop(columns='RainTomorrow')
+y_train = train['RainTomorrow']
 
-# Train-test split with stratification
-x_train, x_test, y_class_train, y_class_test = train_test_split(
-    X, y_class, test_size=0.2, random_state=6, stratify=y_class
-)
+x_test = test.drop(columns='RainTomorrow')
+y_test = test['RainTomorrow']
 
-# Model setup and training
+#setup model
 clf = RandomForestClassifier(
-    n_estimators=250,
-    random_state=6,
+    n_estimators= 250,
+    random_state= 6,
     class_weight='balanced'
 )
-clf.fit(x_train, y_class_train)
 
-base_path = ROOT_DIR /'models'
+clf.fit(x_train, y_train)
 
+#prediksi
 y_pred = clf.predict(x_test)
 
-# Evaluation
-report_path = base_path / 'rain_classifier_report.txt'
+#eval
+model_path = Path(os.path.join(ROOT, 'models'))
+model_path.mkdir(exist_ok=True)
+
+report_path = Path(os.path.join(model_path, 'rain_clf_report.txt'))
 with open(report_path, 'w') as f:
-    f.write(f"Accuracy: {accuracy_score(y_class_test, y_pred)}\n\n")
-    f.write(classification_report(y_class_test, y_pred))
-    f.write(f'\n\n Confusion Matrix: {confusion_matrix(y_class_test, y_pred)}')
+    f.write(f'accuracy: {accuracy_score(y_test, y_pred)}\n\n')
+    f.write(classification_report(y_test, y_pred))
+    f.write(f'\n\nconfusion matrix: \n{confusion_matrix(y_test, y_pred)}')
 
-# Save model
-joblib.dump(clf, base_path / 'rain_classifier.pkl')
+#save model
+model = Path(os.path.join(model_path, 'rain_clf.pkl'))
+joblib.dump(clf, model)
 
-# Feature importance (optional)
-feature_importances = pd.DataFrame({
-    'Feature': X.columns,
-    'Importance': clf.feature_importances_
-}).sort_values(by='Importance', ascending=False)
+#kepentingan features dalam model
+features_importances = Path(os.path.join(model_path, 'features_importances.csv'))
 
-feature_importances.to_csv(base_path/'feature_importances.csv', index=False)
+features_imp = pd.DataFrame({
+    'feature':x_train.columns,
+    'importances': clf.feature_importances_
+}).sort_values(by='importances', ascending= False)
+
+features_imp.to_csv(features_importances, index= False)

@@ -11,6 +11,4 @@ src/preprocessing/feature_engineer.py
 src/training/train.py
 src/data_loader/
 notebooks/
-esp32/
-app/
 struktur.md

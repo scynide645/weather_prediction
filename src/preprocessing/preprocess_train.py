@@ -6,10 +6,10 @@ import os
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 RAW_FILE = Path(os.path.join(ROOT, 'data', 'raw', 'weatherAUS.csv'))
-processed_dir = Path(os.path.join(Root, 'data', 'processed'))
+processed_dir = Path(os.path.join(ROOT, 'data', 'processed'))
 processed_dir.mkdir(exist_ok=True)
 OUT_TRAIN = Path(os.path.join(processed_dir, 'train_processed.csv'))
-OUT_TEST = Path(os.path.join(processed_dir, 'processed','test_processed.csv'))
+OUT_TEST = Path(os.path.join(processed_dir, 'test_processed.csv'))
 ARTIFACTS_DIR = Path(os.path.join(ROOT, 'artifacts'))
 ARTIFACTS_DIR.mkdir(exist_ok=True)
 
@@ -20,11 +20,11 @@ def load_and_clean(df):
         if df[col].isna().sum() > 28000:
             df = df.drop(columns=col)
 
-    # 2. Drop rows (WindDir all NaN)
+    # 2. Drop rows (WindDir yang NaN)
     wd = ['WindGustDir','WindDir9am','WindDir3pm']
     df = df.drop(df.loc[df[wd].isna().all(axis=1)].index)
 
-    # 3. Drop rows with >10 NaN
+    # 3. Drop rows dg >10 NaN
     df = df.drop(df.loc[df.isna().sum(axis=1) > 10].index)
 
     # 4. FillNa pada RainTomorrow dg No
@@ -68,7 +68,7 @@ def feature_engineering(df):
 
     # final features for v1.0 (DHT11 only)
 
-    # extract datetime
+    # datetime
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month'] = df['Date'].dt.month
@@ -98,13 +98,13 @@ def reduce_features(df):
 
 
 def main():
-    # Load raw
+    # Load df
     df = pd.read_csv(RAW_FILE)
 
-    # Cleaning (safe, not leaking)
+    # Cleaning
     df = load_and_clean(df)
 
-    # Train-test split FIRST (anti-leak)
+    # Train-test
     from sklearn.model_selection import train_test_split
     train, test = train_test_split(df, test_size=0.2, shuffle=True, 
                                    random_state=42, stratify=df['RainTomorrow'])
@@ -115,7 +115,7 @@ def main():
         'Humidity9am','Humidity3pm','Pressure9am','Pressure3pm','Temp9am','Temp3pm'
     ]
 
-    # compute medians using TRAIN ONLY
+    # compute medians at TRAIN
     medians = train[num_cols].median()
     joblib.dump(medians, ARTIFACTS_DIR/'medians.pkl')
 
@@ -128,7 +128,7 @@ def main():
     train[['RainToday','RainTomorrow']] = train[['RainToday','RainTomorrow']].fillna('No')
     test[['RainToday','RainTomorrow']] = test[['RainToday','RainTomorrow']].fillna('No')
 
-    # groupby(Location) mode mapping → fit on TRAIN ONLY
+    # groupby(Location) mode mapping
     wind_cols = ['WindGustDir','WindDir9am','WindDir3pm']
     mode_map = (
         train.groupby('Location')[wind_cols]
@@ -165,7 +165,7 @@ def main():
     train.to_csv(OUT_TRAIN, index=False)
     test.to_csv(OUT_TEST, index=False)
 
-    print("Proses Berhasil... Yeyeyyy")
+    print("Proses Berhasil... Congrats")
 
 
 if __name__ == "__main__":

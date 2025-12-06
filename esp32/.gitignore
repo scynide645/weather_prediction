@@ -5,3 +5,4 @@
 .vscode/ipch
 .test
 .lib
+include/config.h

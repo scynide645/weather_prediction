@@ -17,11 +17,11 @@
             <div class="d-flex justify-content-around my-5 p-3 align-items-center">
                 <div class="d-flex flex-column justify-content-around border round-2 shadow">
                     <h3 class="m-2 p-3">Temperature</h3>
-                    <h4 class="p-2 text-center fw-bold"><span id="temp"></span> °C</h4>
+                    <h4 class="p-2 text-center fw-bold"><span id="temp"></span></h4>
                 </div>
                 <div class="d-flex flex-column justify-content-around border round-2 shadow">
                     <h3 class="m-2 p-3">Humidity</h3>
-                    <h4 class="p-2 text-center fw-bold"><span id="hum"></span> °C</h4>
+                    <h4 class="p-2 text-center fw-bold"><span id="hum"></span> </h4>
                 </div>
                 <div class="d-flex flex-column justify-content-around border round-2 shadow">
                     <h3 class="m-2 p-3">Rain or not</h3>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="d-flex flex-column justify-content-around border round-2 shadow">
                     <h3 class="m-2 p-3">Chance of Rain</h3>
-                    <h4 class="p-2 text-center fw-bold"><span id="proba"> %</span></h4>
+                    <h4 class="p-2 text-center fw-bold"><span id="proba"></span></h4>
                 </div>
 
             </div>
@@ -41,11 +41,11 @@
             fetch('/routes/test')
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('temp').innerText = data.temperature ?? "---";
-                    document.getElementById('hum').innerText = data.humidity ?? "---";
+                    document.getElementById('temp').innerText = data.temperature + "°C"?? "---";
+                    document.getElementById('hum').innerText = data.humidity + "°C"?? "---";
                     let rainText = data.rain === 1 ? "Hujan" : "Tidak Hujan";
                     document.getElementById('pred').innerText = rainText ?? "---";
-                    document.getElementById('proba').innerText = data.proba ?? "---";
+                    document.getElementById('proba').innerText = data.proba + "%"?? "---";
                     
                 })
         }
